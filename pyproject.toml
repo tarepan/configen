@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "configen"
-version = "0.0.1"
-description = "OmegaConf-config Generator"
+version = "0.1.0"
+description = "Config Generator"
 authors = ["Tarepan"]
 readme = "README.md"
 repository = "https://github.com/tarepan/configen"
