@@ -1,9 +1,10 @@
 """Configuration loader generation"""
 
-
 from typing import Callable, TypeVar
 
 from omegaconf import OmegaConf, SCMode
+
+from .merge import merge
 
 
 T = TypeVar('T') # dataclass
@@ -14,20 +15,22 @@ def generate_conf_loader(default_str: str, conf_class: T) -> Callable[[], T]:
 
     def load_configuration() -> T:
         """Load configurations."""
-        default = OmegaConf.create(default_str)
-        cli = OmegaConf.from_cli()
 
-        extends_path = cli.get("path_extend_conf", None)
+        # Instantiation
+        default_dict    = OmegaConf.to_container(OmegaConf.create(default_str))
+        cli_dict        = OmegaConf.to_container(OmegaConf.from_cli())
+        extends_path = cli_dict.get("path_extend_conf", None)
         if extends_path:
-            extends = OmegaConf.load(extends_path)
-            conf_final = OmegaConf.merge(default, extends, cli)
+            extend_dict = OmegaConf.to_container(OmegaConf.load(extends_path))
+
+        # Merge
+            conf_unresolved = merge(conf_class(), merge(merge(default_dict, extend_dict), cli_dict))
         else:
-            conf_final = OmegaConf.merge(default, cli)
-        OmegaConf.resolve(conf_final)
-        conf_structured = OmegaConf.merge(
-            OmegaConf.structured(conf_class),
-            conf_final
-        )
+            conf_unresolved = merge(conf_class(), merge(default_dict, cli_dict))
+
+        # Interpolation
+        conf_structured = OmegaConf.structured(conf_unresolved)
+        OmegaConf.resolve(conf_structured)
 
         # Design Note -- OmegaConf instance v.s. DataClass instance --
         #   OmegaConf instance has runtime overhead in exchange for type safety.
@@ -39,8 +42,7 @@ def generate_conf_loader(default_str: str, conf_class: T) -> Callable[[], T]:
         #   One demerit: No "freeze" mechanism in instantiated dataclass.
         #   If OmegaConf, we have `OmegaConf.set_readonly(conf_final, True)`
 
-        # `.to_container()` with `SCMode.INSTANTIATE` resolve interpolations and check MISSING.
-        # It is equal to whole validation.
+        # Validation
         return OmegaConf.to_container(conf_structured, structured_config_mode=SCMode.INSTANTIATE) # type: ignore ; It is validated by omegaconf
 
     return load_configuration
