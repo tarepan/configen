@@ -7,6 +7,14 @@ from .merge import merge
 from .utils import default
 
 
+#### None-None #########################################################################
+def test_merge_primitive_none():
+    """Test `merge` with none-none primitive reassignment."""
+    merged = merge(None, None)
+    assert merged is None
+#### /None-None ########################################################################
+
+
 #### Tuple-Tuple #######################################################################
 def test_merge_tuple_non_nest():
     """Test `merge` with non-nest tuple-tuple element."""

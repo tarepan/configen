@@ -5,7 +5,7 @@ from dataclasses import asdict
 from copy import deepcopy
 
 
-primitives = (None, bool, int, float, str)
+primitives = (type(None), bool, int, float, str)
 
 
 # [Design Notes]
