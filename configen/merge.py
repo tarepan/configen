@@ -13,6 +13,7 @@ primitives = (type(None), bool, int, float, str)
 #     - Merge two partial configs: config file & CLI (basically primitive/tuple/list/dict merge, rarely instance merge)
 #     - Merge instance and config: Config class instance & CLI (Mainly instance-dict merge)
 
+none_type = type(None)
 
 def merge(base: Any, another: Any) -> Any:
     """Merge two objects.
@@ -72,7 +73,7 @@ def merge(base: Any, another: Any) -> Any:
 
     # Heterogenous
     ## Null-Any | Any-Null
-    if (type_base is None) or (type_another is None):
+    if (type_base is none_type) or (type_another is none_type):
         return deepcopy(another)
     ## Instance-Dict
     if type_base not in (primitives + (tuple, list, dict)):

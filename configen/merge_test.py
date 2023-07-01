@@ -8,11 +8,19 @@ from .utils import default
 
 
 #### None-None #########################################################################
-def test_merge_primitive_none():
+def test_merge_none_none():
     """Test `merge` with none-none primitive reassignment."""
     merged = merge(None, None)
     assert merged is None
 #### /None-None ########################################################################
+
+
+#### None-Primitive ####################################################################
+def test_merge_none_primitive():
+    """Test `merge` with none-primitive reassignment."""
+    merged = merge(None, 1)
+    assert merged is 1
+#### /None-Primitive ###################################################################
 
 
 #### Tuple-Tuple #######################################################################
