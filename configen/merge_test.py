@@ -40,6 +40,17 @@ def test_merge_list_primitive():
     assert merged == [4, 5, 6,]
 
 
+def test_merge_list_diff_length():
+    """Test `merge` with non-nest list[2]-list[3] element."""
+    merged = merge(  [1, 2,],
+                     [4, 5, 6,])
+    assert merged == [4, 5, 6,]
+
+    merged = merge(  [1, 2, 3, 4],
+                     [4, 5, 6,])
+    assert merged == [4, 5, 6,]
+
+
 def test_merge_list_template():
     """Test `merge` with non-nest list-list template."""
 
@@ -159,6 +170,7 @@ def test_merge_instance_dict():
         child:      Child       = default(Child(1, False))
         childlen_e: list[Child] = default([Child(attr4=1, attr5=True), Child(attr4=0, attr5=True)])
         childlen_t: list[Child] = default([Child(attr4=1, attr5=True)])
+        childlen_r: list[int]   = default([1, 2, 3])
 
     conf = {
         "attr1": 2,
@@ -167,6 +179,7 @@ def test_merge_instance_dict():
         },
         "childlen_e": [{},            {"attr5": False}],
         "childlen_t": [{},            {"attr4": 0},   {"attr5": False}, {"attr4": 0, "attr5": False}],
+        "childlen_r": [4, 5],
     }
 
     ground_truth = ClsTest(
@@ -177,6 +190,7 @@ def test_merge_instance_dict():
             attr5 = True),
         childlen_e = [Child(1, True), Child(0, False)],
         childlen_t = [Child(1, True), Child(0, True), Child(1, False),  Child(0, False)],
+        childlen_r = [4, 5],
     )
 
     merged = merge(ClsTest(), conf)

@@ -3,6 +3,7 @@
 from typing import Any
 from dataclasses import asdict
 from copy import deepcopy
+import warnings
 
 
 primitives = (type(None), bool, int, float, str)
@@ -108,6 +109,7 @@ def merge_list(base: list[Any], another: list[Any]) -> list[Any]:
     Rules:
         - Element-wise merge: [a1, a2, a3] & [b1, b2, b3] -> [merge(a1,b1), merge(a2,b2), merge(a3,b3)]
         - Template expansion: [t]          & [b1, b2, b3] -> [merge(t, b1), merge(t, b2), merge(t, b3)]
+        - Whole reassignment: [a1, a2]     & [b1, b2, b3] -> [b1, b2, b3]
 
     Args:
         base    - Base list (L>1) OR template in list (L==1)
@@ -123,8 +125,9 @@ def merge_list(base: list[Any], another: list[Any]) -> list[Any]:
     if len(base) == len(another):
         return [merge(base_i, another_i) for base_i, another_i in zip(base, another)]
 
-    # 1<L_base & 1<L_another & L_base != L_another
-    raise RuntimeError(f"List merge support only Element-wise OR template-expansion, but length {len(base)} & {len(another)} is given.")
+    # Whole-list reassignment
+    warnings.warn(f"Non-matched length {len(base)} & {len(another)} is given. Whole list is replaced/reassignment")
+    return another
 
 
 def merge_dict(base: dict[str, Any], another: dict[str, Any]) -> dict[str, Any]:
